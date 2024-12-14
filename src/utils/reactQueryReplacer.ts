@@ -1,115 +1,115 @@
-const mergeObjectWithNotify = (obj: any, mergeObject: any, callback?: any) => {
-  return new Proxy(obj, {
-    get(target, prop, receiver) {
-
-      if (mergeObject[prop]) {
-        callback?.(prop);
-        if (typeof mergeObject[prop] == 'function') {
-          return mergeObject[prop].bind(mergeObject);
-        }
-
-        return mergeObject[prop];
-      }
-
-      if (typeof target[prop] == 'function') {
-        return target[prop].bind(target);
-      }
-
-      return target[prop];
-    }
-  })
-}
+import { mergeWithNotify } from "./mergeWithNotify";
 
 export const reactQueryReplacer = (obj: any, key: any, path: string[]) => {
   // avoid replacing attibutes are added by the replacer
-  if (key === 'queryKey') return path.filter((p) => p !== 'queryKey');
-  if (key === 'queryFn') return path.filter((p) => p !== 'queryFn');
-  if (key === 'mutationFn') return path.filter((p) => p !== 'mutationFn');
+  if (key === "queryKey") return path.filter((p) => p !== "queryKey");
+  if (key === "queryFn") return path.filter((p) => p !== "queryFn");
+  if (key === "mutationFn") return path.filter((p) => p !== "mutationFn");
   // if (key === 'mutationKey') return path.filter((p) => p !== 'mutationKey');
 
   const callback = (...args: any[]) => {
     const argsKey = JSON.stringify(args);
-    const qKey = path.concat(argsKey)
+    const qKey = path.concat(argsKey);
 
     const reactQueryQueryOptions = {
-      // mutationKey: qKey,
       queryKey: qKey,
-
-      mutationFn: () => obj.__trpcOriginalProxy[key].mutate(...args),
       queryFn: () => obj.__trpcOriginalProxy[key].query(...args),
+      // mutationKey: qKey,
+      // mutationFn: () => obj.__trpcOriginalProxy[key].mutate(...args),
     };
 
     let isAborted = false;
     const promise = Promise.resolve().then(() => {
       if (isAborted) return;
       return reactQueryQueryOptions.queryFn();
-    })
-
-    return mergeObjectWithNotify(promise, reactQueryQueryOptions, (prop: string) => {
-      if (prop === 'queryKey') isAborted = true;
-      if (prop === 'queryFn') isAborted = true;
-      // if (prop === 'mutationKey') isAborted = true;
-      if (prop === 'mutatwionFn') isAborted = true;
     });
+
+    const promiseWithGetters = mergeWithNotify(
+      promise,
+      reactQueryQueryOptions,
+      (prop: string) => {
+        if (prop === "queryKey") isAborted = true;
+        if (prop === "queryFn") isAborted = true;
+        // if (prop === 'mutationKey') isAborted = true;
+        if (prop === "mutatwionFn") isAborted = true;
+      },
+    );
+
+    return promiseWithGetters;
   };
 
   return Object.assign(callback, {
     ...(obj[key] as any),
     __trpcOriginalProxy: obj[key],
-    get queryKey() { return path },
-    get mutationFn() { return callback }
-    // get mutationKey() { return path },
+    get queryKey() {
+      return path;
+    },
+    get mutationFn() {
+      return callback;
+    },
   });
 };
 
-type List<A = any> = ReadonlyArray<A>
-type Append<L extends List, A extends any> = [...L, A]
+type List<A = any> = ReadonlyArray<A>;
+type Append<L extends List, A extends any> = [...L, A];
 
-export type TRPCReactQueryCompat<Entry, QueryKeys extends List<string> = ['trpc']> = {
-  [key in Extract<keyof Entry, string>]:
-  Entry[key] extends Query ? (QueryKey<Append<QueryKeys, key>> & QueryProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>)
-  : Entry[key] extends Mutation ? (MutationKey<Append<QueryKeys, key>> & MutationProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>)
-  : TRPCReactQueryCompat<Entry[key], Append<QueryKeys, key>> & QueryKey<Append<QueryKeys, key>>
+export type TRPCReactQueryCompat<
+  Entry,
+  QueryKeys extends List<string> = ["trpc"],
+> = {
+  [key in Extract<keyof Entry, string>]: Entry[key] extends Query
+    ? QueryKey<Append<QueryKeys, key>> &
+        QueryProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>
+    : Entry[key] extends Mutation
+      ? MutationKey<Append<QueryKeys, key>> &
+          MutationProxyCallback<
+            Entry[key],
+            Append<Append<QueryKeys, key>, string>
+          >
+      : TRPCReactQueryCompat<Entry[key], Append<QueryKeys, key>> &
+          QueryKey<Append<QueryKeys, key>>;
   // : never
 } & {
-  queryKey: QueryKeys
+  queryKey: QueryKeys;
   // mutationKey: QueryKeys
 };
 
-type AnyFunction = (...args: any[]) => boolean
+type AnyFunction = (...args: any[]) => boolean;
 
 type Query = { query: any };
 type QueryKey<Key extends string[]> = {
-  queryKey: Key,
-}
+  queryKey: Key;
+};
 
 type QueryFn<Fn extends AnyFunction> = {
-  queryFn: () => ReturnType<Fn>
-}
+  queryFn: () => ReturnType<Fn>;
+};
 
-type QueryProxyCallback<Entry extends { query: AnyFunction }, Keys extends string[]> =
-  // Omit<Entry, keyof Query> & 
-  ((...args: Parameters<Entry['query']>) => (
-    & ReturnType<Entry['query']>
-    & QueryKey<Keys>
-    & QueryFn<Entry['query']>
-  ))
+type QueryProxyCallback<
+  Entry extends { query: AnyFunction },
+  Keys extends string[],
+> =
+  // Omit<Entry, keyof Query> &
+  (
+    ...args: Parameters<Entry["query"]>
+  ) => ReturnType<Entry["query"]> & QueryKey<Keys> & QueryFn<Entry["query"]>;
 
 type Mutation = { mutate: any };
 type MutationKey<Key extends string[]> = {
   // mutationKey: Key,
-}
+};
 
 type MutationFn<Fn extends AnyFunction> = {
-  mutationFn: () => ReturnType<Fn>
-}
+  mutationFn: () => ReturnType<Fn>;
+};
 
-type MutationProxyCallback<Entry extends { mutate: AnyFunction }, Keys extends string[]> =
-  MutationFn<Entry['mutate']> & Entry['mutate'];
+type MutationProxyCallback<
+  Entry extends { mutate: AnyFunction },
+  Keys extends string[],
+> = MutationFn<Entry["mutate"]> & Entry["mutate"];
 // (
 // ((...args: Parameters<Entry['mutate']>) => (
 //   & ReturnType<Entry['mutate']>
 //   & MutationFn<Entry['mutate']>
 // ))
 // ) & Entry['mutate']
-

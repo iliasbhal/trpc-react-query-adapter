@@ -771,6 +771,11 @@
   dependencies:
     "@tanstack/query-core" "5.62.7"
 
+"@trpc/client@^11.0.0-rc.502":
+  version "11.0.0-rc.660"
+  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.0.0-rc.660.tgz#36cc930f31251781b0f0f7d6d5e20f63ff113b43"
+  integrity sha512-bNpkZEfyMGKHynYFxdLpY8nJ1n7E3JHKcd4Pe2cagmpkzOEF9tFT3kzNf+eLI8XMG8196lTRR0J0W2/1Q8/cug==
+
 "@trpc/server@^11.0.0-rc.502":
   version "11.0.0-rc.638"
   resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.0.0-rc.638.tgz#eccf67098465e746c7dbc9c4678ec8cc2c3ff69f"
@@ -2782,6 +2787,11 @@ postcss@8.4.31:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
+prettier@^3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.4.2.tgz#a5ce1fb522a588bf2b78ca44c6e6fe5aa5a2b13f"
+  integrity sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==
+
 pretty-format@^29.0.0, pretty-format@^29.7.0:
   version "29.7.0"
   resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-29.7.0.tgz#ca42c758310f365bfa71a0bda0a807160b776812"
@@ -2860,6 +2870,11 @@ react-is@^18.0.0:
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.3.1.tgz#e83557dc12eae63a99e003a46388b1dcbb44db7e"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
+
+react@^19.0.0:
+  version "19.0.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-19.0.0.tgz#6e1969251b9f108870aa4bff37a0ce9ddfaaabdd"
+  integrity sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==
 
 real-require@^0.2.0:
   version "0.2.0"

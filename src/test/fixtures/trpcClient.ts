@@ -1,36 +1,41 @@
 import { httpBatchLink, createTRPCClient } from "@trpc/client";
-import { FetchEsque, RequestInitEsque } from "@trpc/client/dist/internals/types";
-import { TRPCRouter, createMockTrpcServer } from './trpcRouter'
-import { beforeFetch } from '../../utils/secureBodyTransport';
+import {
+  FetchEsque,
+  RequestInitEsque,
+} from "@trpc/client/dist/internals/types";
+import { TRPCRouter, createMockTrpcServer } from "./trpcRouter";
+import { beforeFetch } from "../../utils/secureBodyTransport";
 
 const createMockFetch = (server: any): FetchEsque => {
-  return jest.fn().mockImplementation(async (url: string, options: RequestInitEsque) => {
-    const request = options.method == 'GET'
-      ? server.get(url)
-      : server.post(url);
+  return jest
+    .fn()
+    .mockImplementation(async (url: string, options: RequestInitEsque) => {
+      const request =
+        options.method == "GET" ? server.get(url) : server.post(url);
 
-    Object.entries(options.headers as any)
-      .forEach(([key, value]) => request.set(key, value));
+      Object.entries(options.headers as any).forEach(([key, value]) =>
+        request.set(key, value),
+      );
 
-    const response = await request.send(options.body);
+      const response = await request.send(options.body);
 
-    return {
-      json() {
-        return response.body;
-      }
-    };
-  })
-}
+      return {
+        json() {
+          return response.body;
+        },
+      };
+    });
+};
 
 export const createTrpcClientWithStub = () => {
   const server = createMockTrpcServer();
-  const mockFetch = createMockFetch(server)
+  const mockFetch = createMockFetch(server);
 
   const trpcClient = createTRPCClient<TRPCRouter>({
     links: [
       httpBatchLink({
-        url: 'http://localhost:3000/trpc',
-        methodOverride: 'POST',
+        url: "http://localhost:3000/trpc",
+        methodOverride: "POST",
         fetch: function (input, options) {
           const updated = beforeFetch(input as string, options as any);
 
@@ -43,11 +48,10 @@ export const createTrpcClientWithStub = () => {
         },
       }),
     ],
-
   });
 
   return {
     trpcClient,
-    stub: mockFetch
+    stub: mockFetch,
   };
-}
+};
