@@ -1,7 +1,9 @@
 {
   "name": "trpc-react-query-adapter",
   "version": "0.0.1",
-  "main": "expo-router/entry",
+  "repository": {
+    "url": "https://github.com/iliasbhal/trpc-react-query-adapter"
+  },
   "scripts": {
     "lint": "prettier --write ./src",
     "test": "jest --verbose --forceExit"
