@@ -1,12 +1,16 @@
 {
   "name": "trpc-react-query-adapter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "url": "https://github.com/iliasbhal/trpc-react-query-adapter"
   },
   "scripts": {
     "lint": "prettier --write ./src",
     "test": "jest --verbose --forceExit"
+  },
+  "peerDependencies": {
+    "@trpc/client": "^11.0.0",
+    "@trpc/server": "^11.0.0"
   },
   "dependencies": {},
   "devDependencies": {
