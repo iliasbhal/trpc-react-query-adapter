@@ -30,7 +30,7 @@ export const reactQueryReplacer = (obj: any, key: any, path: string[]) => {
       (prop: string) => {
         if (prop === "queryKey") isAborted = true;
         if (prop === "queryFn") isAborted = true;
-        // if (prop === 'mutationKey') isAborted = true;
+        if (prop === 'mutationKey') isAborted = true;
         if (prop === "mutatwionFn") isAborted = true;
       },
     );
@@ -58,16 +58,16 @@ export type TRPCReactQueryCompat<
   QueryKeys extends List<string> = ["trpc"],
 > = {
   [key in Extract<keyof Entry, string>]: Entry[key] extends Query
-    ? QueryKey<Append<QueryKeys, key>> &
-        QueryProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>
-    : Entry[key] extends Mutation
-      ? MutationKey<Append<QueryKeys, key>> &
-          MutationProxyCallback<
-            Entry[key],
-            Append<Append<QueryKeys, key>, string>
-          >
-      : TRPCReactQueryCompat<Entry[key], Append<QueryKeys, key>> &
-          QueryKey<Append<QueryKeys, key>>;
+  ? QueryKey<Append<QueryKeys, key>> &
+  QueryProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>
+  : Entry[key] extends Mutation
+  ? MutationKey<Append<QueryKeys, key>> &
+  MutationProxyCallback<
+    Entry[key],
+    Append<Append<QueryKeys, key>, string>
+  >
+  : TRPCReactQueryCompat<Entry[key], Append<QueryKeys, key>> &
+  QueryKey<Append<QueryKeys, key>>;
   // : never
 } & {
   queryKey: QueryKeys;

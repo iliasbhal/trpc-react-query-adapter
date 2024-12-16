@@ -4,7 +4,6 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import express from "express";
 import body from "body-parser";
 import supertest from "supertest";
-import { wrapTrpcExpressMiddleware } from "../../utils/secureBodyTransport";
 
 export type TRPC = typeof trpc;
 
@@ -41,17 +40,19 @@ export const createMockTrpcServer = () => {
 
   api.use(
     "/trpc",
-    wrapTrpcExpressMiddleware(
-      createExpressMiddleware({
-        createContext: () => ({ user: "aa" }),
-        router: trpcRouter,
-        allowMethodOverride: true,
-        allowBatching: true,
-        onError({ error }) {
-          console.log("ERROR", error);
-        },
-      }),
-    ),
+    createExpressMiddleware({
+      createContext: () => ({ user: "aa" }),
+      router: trpcRouter,
+      batching: { enabled: true },
+
+
+      // allowMethodOverride: true,
+      // allowBatching: true,
+
+      onError({ error }) {
+        console.log("ERROR", error);
+      },
+    }),
   );
 
   return supertest(api);

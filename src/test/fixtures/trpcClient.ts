@@ -4,14 +4,16 @@ import {
   RequestInitEsque,
 } from "@trpc/client/dist/internals/types";
 import { TRPCRouter, createMockTrpcServer } from "./trpcRouter";
-import { beforeFetch } from "../../utils/secureBodyTransport";
+
+export { TRPCRouter }
 
 const createMockFetch = (server: any): FetchEsque => {
   return jest
     .fn()
     .mockImplementation(async (url: string, options: RequestInitEsque) => {
+      const urlPath = url.split('localhost:3000').pop();
       const request =
-        options.method == "GET" ? server.get(url) : server.post(url);
+        options.method == "GET" ? server.get(urlPath) : server.post(urlPath);
 
       Object.entries(options.headers as any).forEach(([key, value]) =>
         request.set(key, value),
@@ -35,16 +37,8 @@ export const createTrpcClientWithStub = () => {
     links: [
       httpBatchLink({
         url: "http://localhost:3000/trpc",
-        methodOverride: "POST",
         fetch: function (input, options) {
-          const updated = beforeFetch(input as string, options as any);
-
-          return mockFetch(updated.url, {
-            ...options,
-            method: updated.method,
-            body: JSON.stringify(updated.body),
-            headers: updated.headers,
-          });
+          return mockFetch(input, options);
         },
       }),
     ],

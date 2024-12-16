@@ -17,18 +17,21 @@ export const recursiveProxyMap = <Entry extends object>(
         return replaced;
       }
 
-      if (replaced === target[prop]) {
+      // @ts-ignore
+      const value = target[prop];
+      if (replaced === value) {
         // if replcaed is the same as the original value,
         // then no need to apply recursive proxy
-        return target[prop];
+        return value;
       }
 
       if (replaced) {
         return recursiveProxyMap(replaced, replacer, nextPath);
       }
 
-      if (typeof target[prop] === "object") {
-        return recursiveProxyMap(target[prop], replacer, nextPath);
+      if (typeof value === "object") {
+        // @ts-ignore
+        return recursiveProxyMap(value, replacer, nextPath);
       }
 
       return Reflect.get(target, prop, receiver);

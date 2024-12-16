@@ -1,15 +1,19 @@
-import { CreateTRPCClient } from "@trpc/client";
+// import { CreateTRPCProxyClient } from "@trpc/client";
 import { AnyTRPCRouter } from "@trpc/server";
+import type { CreateTRPCClient, inferRouterClient } from "@trpc/client";
+
+// DecoratedProcedureRecord<TRouter, TRouter['_def']['record']>
+
 import { recursiveProxyMap } from "./utils/recursiveProxyMap";
 import {
   reactQueryReplacer,
   TRPCReactQueryCompat,
 } from "./utils/reactQueryReplacer";
 
-export const createTrpcReactQuery = <Router extends AnyTRPCRouter>(
-  trpcClient: CreateTRPCClient<Router>,
+export const createTrpcReactQuery = <Client extends inferRouterClient<any>>(
+  trpcClient: Client,
 ) => {
   return recursiveProxyMap(trpcClient, reactQueryReplacer, [
     "trpc",
-  ]) as TRPCReactQueryCompat<typeof trpcClient>;
+  ]) as any as TRPCReactQueryCompat<Client>;
 };

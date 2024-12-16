@@ -1,4 +1,4 @@
-import { createTrpcClientWithStub } from "./fixtures/trpcClient";
+import { createTrpcClientWithStub, TRPCRouter } from "./fixtures/trpcClient";
 import { createTrpcReactQuery } from "../index";
 import wait from "wait";
 
@@ -10,7 +10,7 @@ describe("Trpc React Query Adapter", () => {
     expect(trpcRQ.queryKey).toEqual(["trpc"]);
   });
 
-  it("should call .query directly ", async () => {
+  it("can be used like regular trpcClient", async () => {
     const { trpcClient, stub } = createTrpcClientWithStub();
     const trpcRQ = createTrpcReactQuery(trpcClient);
 
