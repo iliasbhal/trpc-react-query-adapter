@@ -56,22 +56,16 @@ type Append<L extends List, A extends any> = [...L, A];
 export type TRPCReactQueryCompat<
   Entry,
   QueryKeys extends List<string> = ["trpc"],
+  WithQueryKeys extends boolean = true,
 > = {
   [key in Extract<keyof Entry, string>]: Entry[key] extends Query
-  ? QueryKey<Append<QueryKeys, key>> &
-  QueryProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>
+  ? QueryKey<Append<QueryKeys, key>> & QueryProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>, WithQueryKeys>
   : Entry[key] extends Mutation
-  ? MutationKey<Append<QueryKeys, key>> &
-  MutationProxyCallback<
-    Entry[key],
-    Append<Append<QueryKeys, key>, string>
-  >
-  : TRPCReactQueryCompat<Entry[key], Append<QueryKeys, key>> &
-  QueryKey<Append<QueryKeys, key>>;
-  // : never
+  ? MutationKey<Append<QueryKeys, key>> & MutationProxyCallback<Entry[key], Append<Append<QueryKeys, key>, string>>
+  : TRPCReactQueryCompat<Entry[key], Append<QueryKeys, key>, WithQueryKeys> & QueryKey<Append<QueryKeys, key>>;
 } & {
   queryKey: QueryKeys;
-  // mutationKey: QueryKeys
+  mutationKey: QueryKeys
 };
 
 type AnyFunction = (...args: any[]) => boolean;
@@ -85,31 +79,30 @@ type QueryFn<Fn extends AnyFunction> = {
   queryFn: () => ReturnType<Fn>;
 };
 
+
+
 type QueryProxyCallback<
   Entry extends { query: AnyFunction },
   Keys extends string[],
-> =
-  // Omit<Entry, keyof Query> &
-  (
-    ...args: Parameters<Entry["query"]>
-  ) => ReturnType<Entry["query"]> & QueryKey<Keys> & QueryFn<Entry["query"]>;
+  WithQueryKeys extends boolean,
+> = WithQueryKeys extends false ? Entry["query"] : (
+  { query: (...args: Parameters<Entry["query"]>) => ReturnType<Entry["query"]> } &
+  ((...args: Parameters<Entry["query"]>) => (ReturnType<Entry["query"]> & QueryKey<Keys> & QueryFn<Entry["query"]>))
+)
 
 type Mutation = { mutate: any };
 type MutationKey<Key extends string[]> = {
-  // mutationKey: Key,
+  mutationKey: Key,
 };
 
 type MutationFn<Fn extends AnyFunction> = {
-  mutationFn: () => ReturnType<Fn>;
+  mutationFn: Fn;
 };
 
 type MutationProxyCallback<
   Entry extends { mutate: AnyFunction },
   Keys extends string[],
-> = MutationFn<Entry["mutate"]> & Entry["mutate"];
-// (
-// ((...args: Parameters<Entry['mutate']>) => (
-//   & ReturnType<Entry['mutate']>
-//   & MutationFn<Entry['mutate']>
-// ))
-// ) & Entry['mutate']
+> = MutationFn<Entry["mutate"]> & Entry["mutate"] & {
+  mutate: (...args: Parameters<Entry["mutate"]>) => ReturnType<Entry["mutate"]>;
+}
+

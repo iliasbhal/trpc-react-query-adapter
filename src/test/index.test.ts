@@ -1,4 +1,4 @@
-import { createTrpcClientWithStub, TRPCRouter } from "./fixtures/trpcClient";
+import { createTrpcClientWithStub } from "./fixtures/trpcClient";
 import { createTrpcReactQuery } from "../index";
 import wait from "wait";
 

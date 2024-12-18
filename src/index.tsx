@@ -8,7 +8,15 @@ import {
 
 export const createTrpcReactQuery = <Client extends inferRouterClient<any>>(
   trpcClient: Client,
-) : TRPCReactQueryCompat<Client> => {
+) : TRPCReactQueryCompat<Client, ['trpc'], true> => {
+  return recursiveProxyMap(trpcClient, reactQueryReplacer, [
+    "trpc",
+  ]);
+};
+
+export const createSimpleTrpcClient = <Client extends inferRouterClient<any>>(
+  trpcClient: Client,
+) : TRPCReactQueryCompat<Client, ['trpc'], false> => {
   return recursiveProxyMap(trpcClient, reactQueryReplacer, [
     "trpc",
   ]);
