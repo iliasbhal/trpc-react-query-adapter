@@ -1,11 +1,15 @@
 import { createTrpcClientWithStub } from "./fixtures/trpcClient";
-import { createTrpcReactQuery } from "../index";
+import { createTrpcReactQuery, createReactQueryOptionsBuilder } from "../index";
 import * as RQ from "@tanstack/react-query";
 
 describe.skip("Trpc - useQuery", () => {
   it("root has a queryKey", async () => {
     const { trpcClient } = createTrpcClientWithStub();
     const api = createTrpcReactQuery(trpcClient);
+
+    // const builder = createReactQueryOptionsBuilder(api);
+    // const qqq = builder.query((trpc) => trpc.stringTools.read("123213"));
+    // const vvv = builder.mutation((trpc) => trpc.stringTools.read);
 
     const res1 = await api.stringTools.all("asd");
     const res2 = await api.stringTools.read("123213");
@@ -16,12 +20,17 @@ describe.skip("Trpc - useQuery", () => {
 
     const queries = RQ.useQueries({
       queries: [api.stringTools.read("asd"), api.stringTools.read("asd")],
-      combine(result) {},
+      combine(result) { },
     });
 
     const queriesSus = RQ.useSuspenseQueries({
-      queries: [api.stringTools.read("asd"), api.stringTools.read("asd")],
-      combine(result) {},
+      queries: [
+        api.stringTools.read("asd"),
+        api.stringTools.read("asd")
+      ],
+      combine(result) {
+
+      },
     });
 
     RQ.useInfiniteQuery({

@@ -21,3 +21,5 @@ export const createSimpleTrpcClient = <Client extends inferRouterClient<any>>(
     "trpc",
   ]);
 };
+
+export { createReactQueryOptionsBuilder } from './utils/createReactQueryOptionBuilder'
