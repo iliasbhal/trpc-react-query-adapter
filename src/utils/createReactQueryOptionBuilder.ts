@@ -1,7 +1,7 @@
 type Keys = 'queryKey' | 'mutationKey' | 'queryFn' | 'mutationFn'
 
 type RemoveKey<T> = {
-  [K in Exclude<keyof T, Keys>]: RemoveKey<T[K]>
+  [K in Exclude<keyof T, Keys>]: T[K] extends Function ? T[K] : RemoveKey<T[K]>
 }
 
 export const createReactQueryOptionsBuilder = <Client>(client: Client) => {
