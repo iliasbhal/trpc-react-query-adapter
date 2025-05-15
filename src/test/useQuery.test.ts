@@ -19,8 +19,11 @@ describe.skip("Trpc - useQuery", () => {
     const querySus = RQ.useSuspenseQuery(api.stringTools.read("asd"));
 
     const queries = RQ.useQueries({
-      queries: [api.stringTools.read("asd"), api.stringTools.read("asd")],
-      combine(result) { },
+      queries: [
+        api.stringTools.read("asd"),
+        api.stringTools.read("asd")
+      ],
+      // combine(result) { },
     });
 
     const queriesSus = RQ.useSuspenseQueries({
@@ -28,15 +31,15 @@ describe.skip("Trpc - useQuery", () => {
         api.stringTools.read("asd"),
         api.stringTools.read("asd")
       ],
-      combine(result) {
+      // combine(result) {
 
-      },
+      // },
     });
 
-    RQ.useInfiniteQuery({
+    const { data } = RQ.useInfiniteQuery({
       queryKey: [""],
       queryFn: async (args) => {
-        api.stringTools.read(args.pageParam.toString());
+        return api.stringTools.read(args.pageParam.toString());
       },
       initialPageParam: 0,
       getNextPageParam: () => {
